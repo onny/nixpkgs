@@ -1,4 +1,13 @@
-{ lib, stdenv, fetchurl, foomatic-filters, bc, ghostscript, systemd, vim, time }:
+{ lib
+, stdenv
+, fetchurl
+, fetchpatch
+, foomatic-filters
+, bc
+, ghostscript
+, systemd
+, vim
+, time }:
 
 stdenv.mkDerivation rec {
   pname = "foo2zjs";
@@ -11,7 +20,21 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ foomatic-filters bc ghostscript systemd vim ];
 
-  patches = [ ./no-hardcode-fw.diff ];
+  patches = [
+    ./no-hardcode-fw.diff
+
+    # Support HBPL1 printers https://www.dechifro.org/hbpl/
+    # Updated original patch to be compatible with latest foo2zjs
+    ./hbpl1.patch
+
+    # Fix "Unimplemented paper code" error for hbpl1 printers
+    # https://github.com/mikerr/foo2zjs/pull/2
+    (fetchpatch {
+      url = "https://patch-diff.githubusercontent.com/raw/mikerr/foo2zjs/pull/2.patch";
+      sha256 = "0lvbryw6ymh0ahwkhqsgmjimg5saa8b1xnxmyyjxrbi3l3a6fbvy";
+    })
+
+  ];
 
   makeFlags = [
     "PREFIX=$(out)"
