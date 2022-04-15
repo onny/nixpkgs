@@ -8,7 +8,8 @@
 , iw
 , makeWrapper
 , qrencode
-, hostapd }:
+, hostapd
+, getopt }:
 
 stdenv.mkDerivation rec {
   pname = "linux-wifi-hotspot";
@@ -52,7 +53,7 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     wrapProgram $out/bin/create_ap \
-      --prefix PATH : ${lib.makeBinPath [ hostapd ]}
+      --prefix PATH : ${lib.makeBinPath [ hostapd  getopt ]}
 
     wrapProgram $out/bin/wihotspot-gui \
       --prefix PATH : ${lib.makeBinPath [ iw ]} \
