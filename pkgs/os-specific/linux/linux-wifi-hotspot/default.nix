@@ -6,7 +6,6 @@
 , glib
 , gtk3
 , iw
-, iwconfig
 , makeWrapper
 , qrencode
 , hostapd
@@ -54,7 +53,7 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     wrapProgram $out/bin/create_ap \
-      --prefix PATH : ${lib.makeBinPath [ iw iwconfig hostapd  getopt ]}
+      --prefix PATH : ${lib.makeBinPath [ iw hostapd  getopt ]}
 
     wrapProgram $out/bin/wihotspot-gui \
       --prefix PATH : ${lib.makeBinPath [ iw ]} \
