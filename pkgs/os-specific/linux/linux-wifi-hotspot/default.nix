@@ -45,6 +45,9 @@ stdenv.mkDerivation rec {
     substituteInPlace ./src/scripts/create_ap.service \
       --replace "/usr/bin/create_ap" "$out/bin/create_cap" \
       --replace "/etc/create_ap.conf" "$out/etc/create_cap.conf"
+    # DEBUG
+    substituteInPlace ./src/scripts/create_ap \
+      --replace "which iw " "iw && which iw "
   '';
 
   makeFlags = [
