@@ -1,6 +1,5 @@
 { lib
 , mkDerivation
-, fetchFromGitLab
 , cmake
 , extra-cmake-modules
 , applet-window-buttons
@@ -11,22 +10,14 @@
 , kirigami2
 , mauikit
 , mauikit-filebrowsing
-, mauikit-texteditor
 , qtmultimedia
 , qtquickcontrols2
+, taglib
+, ffmpeg
 }:
 
 mkDerivation rec {
-  pname = "nota";
-  version = "2.1.1";
-
-  src = fetchFromGitLab {
-    domain = "invent.kde.org";
-    owner = "maui";
-    repo = "nota";
-    rev = "v${version}";
-    sha256 = "sha256-Sgpm5njhQDe9ohAVFcN5iPNC6v9+QZnGRPYxuLvUno8=";
-  };
+  pname = "clip";
 
   nativeBuildInputs = [
     cmake
@@ -42,14 +33,15 @@ mkDerivation rec {
     kirigami2
     mauikit
     mauikit-filebrowsing
-    mauikit-texteditor
     qtmultimedia
     qtquickcontrols2
+    taglib
+    ffmpeg
   ];
 
   meta = with lib; {
-    description = "Multi-platform text editor";
-    homepage = "https://invent.kde.org/maui/nota";
+    description = "Video player and video collection manager";
+    homepage = "https://invent.kde.org/maui/clip";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ onny ];
   };

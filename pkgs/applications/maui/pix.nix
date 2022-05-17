@@ -11,23 +11,18 @@
 , kirigami2
 , mauikit
 , mauikit-filebrowsing
+, mauikit-imagetools
 , qtmultimedia
 , qtquickcontrols2
-, taglib
-, ffmpeg
+, qtlocation
+, exiv2
+, kquickimageedit
+, fetchpatch
 }:
 
 mkDerivation rec {
-  pname = "clip";
-  version = "2.1.1";
-
-  src = fetchFromGitLab {
-    domain = "invent.kde.org";
-    owner = "maui";
-    repo = "clip";
-    rev = "v${version}";
-    sha256 = "sha256-vW3A0PKJSC2QNs+QVZ9w0g4aVmcndhahrpkd4wWoUko=";
-  };
+  pname = "pix";
+  version = "2.1.2";
 
   nativeBuildInputs = [
     cmake
@@ -43,16 +38,19 @@ mkDerivation rec {
     kirigami2
     mauikit
     mauikit-filebrowsing
+    mauikit-imagetools
     qtmultimedia
     qtquickcontrols2
-    taglib
-    ffmpeg
+    qtlocation
+    exiv2
+    kquickimageedit
   ];
 
   meta = with lib; {
-    description = "Video player and video collection manager";
-    homepage = "https://invent.kde.org/maui/clip";
+    description = "Image gallery application";
+    homepage = "https://invent.kde.org/maui/pix";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ onny ];
   };
 }
+

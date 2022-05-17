@@ -1,6 +1,5 @@
 { lib
 , mkDerivation
-, fetchFromGitLab
 , cmake
 , extra-cmake-modules
 , applet-window-buttons
@@ -10,29 +9,27 @@
 , kio
 , kirigami2
 , mauikit
-, mauikit-filebrowsing
 , mauikit-accounts
+, mauikit-filebrowsing
 , mauikit-texteditor
 , qtmultimedia
 , qtquickcontrols2
+, kpeople
+, kcontacts
 }:
 
 mkDerivation rec {
-  pname = "buho";
-  version = "2.1.1";
-
-  src = fetchFromGitLab {
-    domain = "invent.kde.org";
-    owner = "maui";
-    repo = "buho";
-    rev = "v${version}";
-    sha256 = "sha256-rHjjvjRY2WsyZfj3fzp46copZ1g2ae6PVv9lBNZDzcI=";
-  };
+  pname = "communicator";
 
   nativeBuildInputs = [
     cmake
     extra-cmake-modules
   ];
+
+  postPatch = ''
+    substituteInPlace CMakeLists.txt \
+      --replace "/usr/share/maui-accounts/manifests" "$out/usr/share/maui-accounts/manifests"
+  '';
 
   buildInputs = [
     applet-window-buttons
@@ -42,16 +39,18 @@ mkDerivation rec {
     kio
     kirigami2
     mauikit
-    mauikit-filebrowsing
     mauikit-accounts
+    mauikit-filebrowsing
     mauikit-texteditor
     qtmultimedia
     qtquickcontrols2
+    kpeople
+    kcontacts
   ];
 
   meta = with lib; {
-    description = "Task and Note Keeper";
-    homepage = "https://invent.kde.org/maui/buho";
+    description = "Contacts and dialer application";
+    homepage = "https://invent.kde.org/maui/communicator";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ onny ];
   };

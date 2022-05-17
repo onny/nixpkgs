@@ -1,6 +1,5 @@
 { lib
 , mkDerivation
-, fetchFromGitLab
 , cmake
 , extra-cmake-modules
 , kconfig
@@ -10,15 +9,6 @@
 
 mkDerivation rec {
   pname = "mauikit-filebrowsing";
-  version = "2.1.1";
-
-  src = fetchFromGitLab {
-    domain = "invent.kde.org";
-    owner = "maui";
-    repo = "mauikit-filebrowsing";
-    rev = "v${version}";
-    hash = "sha256-2LzGvjh2t4RVZS9Js7ky3hM51L7bx0SHmDlKKPjl3LM=";
-  };
 
   nativeBuildInputs = [
     cmake

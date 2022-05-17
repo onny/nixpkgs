@@ -1,6 +1,5 @@
 { lib
 , mkDerivation
-, fetchFromGitLab
 , cmake
 , extra-cmake-modules
 , kconfig
@@ -10,15 +9,6 @@
 
 mkDerivation rec {
   pname = "mauikit-accounts";
-  version = "2.1.1";
-
-  src = fetchFromGitLab {
-    domain = "invent.kde.org";
-    owner = "maui";
-    repo = "mauikit-accounts";
-    rev = "v${version}";
-    sha256 = "sha256-B0VmgE0L8kBOqR/lrWCHO3psCQ7GZVPIGljGAwpuymE=";
-  };
 
   nativeBuildInputs = [
     cmake
