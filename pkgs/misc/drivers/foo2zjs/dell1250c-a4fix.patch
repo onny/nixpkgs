@@ -1,0 +1,13 @@
+diff --git a/PPD/Dell-1250c.ppd b/PPD/Dell-1250c.ppd
+index 828ecd6..43dfdb6 100644
+--- a/PPD/Dell-1250c.ppd
++++ b/PPD/Dell-1250c.ppd
+@@ -184,8 +184,6 @@
+ *FoomaticRIPOptionSetting MediaType=bond: "-m2 "
+ *MediaType bond2/Bond Side 2: "%% FoomaticRIPOptionSetting: MediaType=bond2"
+ *FoomaticRIPOptionSetting MediaType=bond2: "-m9 "
+-*MediaType envelope/Envelope: "%% FoomaticRIPOptionSetting: MediaType=envelope"
+-*FoomaticRIPOptionSetting MediaType=envelope: "-m6 "
+ *MediaType labels/Labels: "%% FoomaticRIPOptionSetting: MediaType=labels"
+ *FoomaticRIPOptionSetting MediaType=labels: "-m5 "
+ *MediaType lwcard/Light Weight Card: "%% FoomaticRIPOptionSetting: MediaType=lwcard"
