@@ -107,7 +107,7 @@ in
         };
 
         virtualHosts.${cfg.hostname} = {
-          listen = [ { port = ${cfg.webserver.port}; } ];
+          listen = [ { port = cfg.webserver.port } ];
           locations = {
             # /etc/nginx/includes/ds-docservice.conf
             "~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$".extraConfig = ''
