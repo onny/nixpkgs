@@ -39,6 +39,12 @@ in
       description = "Port the OnlyOffice DocumentServer should listens on.";
     };
 
+    webserver.port = mkOption {
+      type = types.port;
+      default = 80;
+      description = "Port the Nginx web server should listens on.";
+    };
+
     examplePort = mkOption {
       type = types.port;
       default = null;
@@ -101,6 +107,7 @@ in
         };
 
         virtualHosts.${cfg.hostname} = {
+          listen = [ { port = ${cfg.webserver.port}; } ];
           locations = {
             # /etc/nginx/includes/ds-docservice.conf
             "~ ^(\/[\d]+\.[\d]+\.[\d]+[\.|-][\d]+)?\/(web-apps\/apps\/api\/documents\/api\.js)$".extraConfig = ''
