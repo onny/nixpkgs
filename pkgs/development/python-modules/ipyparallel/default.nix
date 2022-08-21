@@ -13,13 +13,13 @@
 , psutil
 , tornado
 , tqdm
-, isPy3k
-, futures ? null
+, hatchling
 }:
 
 buildPythonPackage rec {
   pname = "ipyparallel";
   version = "8.4.1";
+  format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
@@ -28,13 +28,23 @@ buildPythonPackage rec {
 
   buildInputs = [ nose ];
 
-  propagatedBuildInputs = [ python-dateutil ipython_genutils decorator pyzmq ipython jupyter-client ipykernel packaging psutil tornado tqdm
-  ] ++ lib.optionals (!isPy3k) [ futures ];
+  propagatedBuildInputs = [
+    decorator
+    hatchling
+    ipykernel
+    ipython
+    ipython_genutils
+    jupyter-client
+    packaging
+    psutil
+    python-dateutil
+    pyzmq
+    tornado
+    tqdm
+  ];
 
   # Requires access to cluster
   doCheck = false;
-
-  disabled = !isPy3k;
 
   meta = {
     description = "Interactive Parallel Computing with IPython";
