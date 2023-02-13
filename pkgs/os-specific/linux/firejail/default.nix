@@ -17,7 +17,7 @@ stdenv.mkDerivation rec {
     owner = "netblue30";
     repo = "firejail";
     rev = version;
-    sha256 = "sha256-XAlb6SSyY2S1iWDaulIlghQ16OGvT/wBCog95/nxkog=";
+    hash = "sha256-XAlb6SSyY2S1iWDaulIlghQ16OGvT/wBCog95/nxkog=";
   };
 
   nativeBuildInputs = [
@@ -41,6 +41,17 @@ stdenv.mkDerivation rec {
     # By default fbuilder hardcodes the firejail binary to the install path.
     # On NixOS the firejail binary is a setuid wrapper available in $PATH.
     ./fbuilder-call-firejail-on-path.patch
+
+    # Currently, if double-dash ("--") is passed to firejail, it is forwarded
+    # to the user shell. This causes issues when the user shell does not accept
+    # "--" / is not POSIX-compatible.
+    # Fixed with https://github.com/netblue30/firejail/pull/5600
+    # PatchcCan be removed on Firejail releases after 0.9.72
+    (fetchpatch {
+      name = "stop-forwarding-double-dash-to-shell.patch";
+      url = "https://github.com/netblue30/firejail/commit/497c39e89ace26b82c782b46e547afb051b771b4.patch";
+      hash = "sha256-UkijzCxopYTaz9YF6J8huW1u7TVNSJnsa/46bx3JbJs=";
+    })
   ];
 
   prePatch = ''
@@ -87,11 +98,11 @@ stdenv.mkDerivation rec {
 
   passthru.tests = nixosTests.firejail;
 
-  meta = {
+  meta = with lib; {
     description = "Namespace-based sandboxing tool for Linux";
-    license = lib.licenses.gpl2Plus;
-    maintainers = [ lib.maintainers.raskin ];
-    platforms = lib.platforms.linux;
+    license = licenses.gpl2Plus;
+    maintainers = [ maintainers.raskin ];
+    platforms = platforms.linux;
     homepage = "https://firejail.wordpress.com/";
   };
 }
