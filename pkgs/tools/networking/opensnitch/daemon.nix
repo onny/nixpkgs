@@ -42,6 +42,8 @@ buildGoModule rec {
 
   vendorSha256 = "sha256-jWP0oF+jZRFMi5Y2y0SARMoP8wTKVZ8UWra9JNzdSOw=";
 
+  NIX_CFLAGS_COMPILE = "-fno-stack-protector";
+
   preBuild = ''
     # Fix inconsistent vendoring build error
     # https://github.com/evilsocket/opensnitch/issues/770
