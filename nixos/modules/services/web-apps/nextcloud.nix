@@ -79,6 +79,9 @@ in {
       [ "services" "nextcloud" "config" "extraTrustedDomains" ] [ "services" "nextcloud" "extraOptions" "trusted_domains" ])
     (mkRenamedOptionModule
       [ "services" "nextcloud" "config" "trustedProxies" ] [ "services" "nextcloud" "extraOptions" "trusted_proxies" ])
+    (mkRenamedOptionModule
+      [ "services" "nextcloud" "config" "objectstore" ] [ "services" "nextcloud" "extraOptions" "objectstore" ])
+
   ];
 
   options.services.nextcloud = {
@@ -357,110 +360,6 @@ in {
         '';
       };
 
-      objectstore = {
-        s3 = {
-          enable = mkEnableOption (lib.mdDoc ''
-            S3 object storage as primary storage.
-
-            This mounts a bucket on an Amazon S3 object storage or compatible
-            implementation into the virtual filesystem.
-
-            Further details about this feature can be found in the
-            [upstream documentation](https://docs.nextcloud.com/server/22/admin_manual/configuration_files/primary_storage.html).
-          '');
-          bucket = mkOption {
-            type = types.str;
-            example = "nextcloud";
-            description = lib.mdDoc ''
-              The name of the S3 bucket.
-            '';
-          };
-          autocreate = mkOption {
-            type = types.bool;
-            description = lib.mdDoc ''
-              Create the objectstore if it does not exist.
-            '';
-          };
-          key = mkOption {
-            type = types.str;
-            example = "EJ39ITYZEUH5BGWDRUFY";
-            description = lib.mdDoc ''
-              The access key for the S3 bucket.
-            '';
-          };
-          secretFile = mkOption {
-            type = types.str;
-            example = "/var/nextcloud-objectstore-s3-secret";
-            description = lib.mdDoc ''
-              The full path to a file that contains the access secret. Must be
-              readable by user `nextcloud`.
-            '';
-          };
-          hostname = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            example = "example.com";
-            description = lib.mdDoc ''
-              Required for some non-Amazon implementations.
-            '';
-          };
-          port = mkOption {
-            type = types.nullOr types.port;
-            default = null;
-            description = lib.mdDoc ''
-              Required for some non-Amazon implementations.
-            '';
-          };
-          useSsl = mkOption {
-            type = types.bool;
-            default = true;
-            description = lib.mdDoc ''
-              Use SSL for objectstore access.
-            '';
-          };
-          region = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            example = "REGION";
-            description = lib.mdDoc ''
-              Required for some non-Amazon implementations.
-            '';
-          };
-          usePathStyle = mkOption {
-            type = types.bool;
-            default = false;
-            description = lib.mdDoc ''
-              Required for some non-Amazon S3 implementations.
-
-              Ordinarily, requests will be made with
-              `http://bucket.hostname.domain/`, but with path style
-              enabled requests are made with
-              `http://hostname.domain/bucket` instead.
-            '';
-          };
-          sseCKeyFile = mkOption {
-            type = types.nullOr types.path;
-            default = null;
-            example = "/var/nextcloud-objectstore-s3-sse-c-key";
-            description = lib.mdDoc ''
-              If provided this is the full path to a file that contains the key
-              to enable [server-side encryption with customer-provided keys][1]
-              (SSE-C).
-
-              The file must contain a random 32-byte key encoded as a base64
-              string, e.g. generated with the command
-
-              ```
-              openssl rand 32 | base64
-              ```
-
-              Must be readable by user `nextcloud`.
-
-              [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html
-            '';
-          };
-        };
-      };
     };
 
     enableImagemagick = mkEnableOption (lib.mdDoc ''
@@ -632,6 +531,110 @@ in {
               '';
             };
           };
+          objectstore = {
+            s3 = {
+              enable = mkEnableOption (lib.mdDoc ''
+                S3 object storage as primary storage.
+
+                This mounts a bucket on an Amazon S3 object storage or compatible
+                implementation into the virtual filesystem.
+
+                Further details about this feature can be found in the
+                [upstream documentation](https://docs.nextcloud.com/server/22/admin_manual/configuration_files/primary_storage.html).
+              '');
+              bucket = mkOption {
+                type = types.str;
+                example = "nextcloud";
+                description = lib.mdDoc ''
+                  The name of the S3 bucket.
+                '';
+              };
+              autocreate = mkOption {
+                type = types.bool;
+                description = lib.mdDoc ''
+                  Create the objectstore if it does not exist.
+                '';
+              };
+              key = mkOption {
+                type = types.str;
+                example = "EJ39ITYZEUH5BGWDRUFY";
+                description = lib.mdDoc ''
+                  The access key for the S3 bucket.
+                '';
+              };
+              secretFile = mkOption {
+                type = types.str;
+                example = "/var/nextcloud-objectstore-s3-secret";
+                description = lib.mdDoc ''
+                  The full path to a file that contains the access secret. Must be
+                  readable by user `nextcloud`.
+                '';
+              };
+              hostname = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "example.com";
+                description = lib.mdDoc ''
+                  Required for some non-Amazon implementations.
+                '';
+              };
+              port = mkOption {
+                type = types.nullOr types.port;
+                default = null;
+                description = lib.mdDoc ''
+                  Required for some non-Amazon implementations.
+                '';
+              };
+              useSsl = mkOption {
+                type = types.bool;
+                default = true;
+                description = lib.mdDoc ''
+                  Use SSL for objectstore access.
+                '';
+              };
+              region = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "REGION";
+                description = lib.mdDoc ''
+                  Required for some non-Amazon implementations.
+                '';
+              };
+              usePathStyle = mkOption {
+                type = types.bool;
+                default = false;
+                description = lib.mdDoc ''
+                  Required for some non-Amazon S3 implementations.
+
+                  Ordinarily, requests will be made with
+                  `http://bucket.hostname.domain/`, but with path style
+                  enabled requests are made with
+                  `http://hostname.domain/bucket` instead.
+                '';
+              };
+              sseCKeyFile = mkOption {
+                type = types.nullOr types.path;
+                default = null;
+                example = "/var/nextcloud-objectstore-s3-sse-c-key";
+                description = lib.mdDoc ''
+                  If provided this is the full path to a file that contains the key
+                  to enable [server-side encryption with customer-provided keys][1]
+                  (SSE-C).
+
+                  The file must contain a random 32-byte key encoded as a base64
+                  string, e.g. generated with the command
+
+                  ```
+                  openssl rand 32 | base64
+                  ```
+
+                  Must be readable by user `nextcloud`.
+
+                  [1]: https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html
+                '';
+              };
+            };
+          };
         };
       };
       default = {};
@@ -781,25 +784,7 @@ in {
 
         nextcloud-setup = let
           c = cfg.config;
-          requiresReadSecretFunction = c.dbpassFile != null || c.objectstore.s3.enable;
-          objectstoreConfig = let s3 = c.objectstore.s3; in optionalString s3.enable ''
-            'objectstore' => [
-              'class' => '\\OC\\Files\\ObjectStore\\S3',
-              'arguments' => [
-                'bucket' => '${s3.bucket}',
-                'autocreate' => ${boolToString s3.autocreate},
-                'key' => '${s3.key}',
-                'secret' => nix_read_secret('${s3.secretFile}'),
-                ${optionalString (s3.hostname != null) "'hostname' => '${s3.hostname}',"}
-                ${optionalString (s3.port != null) "'port' => ${toString s3.port},"}
-                'use_ssl' => ${boolToString s3.useSsl},
-                ${optionalString (s3.region != null) "'region' => '${s3.region}',"}
-                'use_path_style' => ${boolToString s3.usePathStyle},
-                ${optionalString (s3.sseCKeyFile != null) "'sse_c_key' => nix_read_secret('${s3.sseCKeyFile}'),"}
-              ],
-            ]
-          '';
-
+          requiresReadSecretFunction = c.dbpassFile != null || cfg.extraOptions.objectstore.s3.enable;
           showAppStoreSetting = cfg.appstoreEnable != null || cfg.extraApps != {};
           renderedAppStoreSetting =
             let
@@ -855,7 +840,6 @@ in {
                 ''
               }
               'dbtype' => '${c.dbtype}',
-              ${objectstoreConfig}
             ];
 
             $CONFIG = array_replace_recursive($CONFIG, nix_decode_json_file(
