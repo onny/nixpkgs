@@ -1,0 +1,24 @@
+diff --git a/src/rspamd_trainer/run.py b/src/rspamd_trainer/run.py
+index 62966a8..ba4d27b 100755
+--- a/src/rspamd_trainer/run.py
++++ b/src/rspamd_trainer/run.py
+@@ -4,6 +4,7 @@ from helper.setup_logging import configure_logging
+ from imapclient import IMAPClient
+ from subprocess import run, PIPE, CalledProcessError
+ from settings import HOST, USERNAME, PASSWORD, INBOXPREFIX, folder_suffixes
++import ssl
+ 
+ def main():
+ 
+@@ -24,7 +25,10 @@ def main():
+             server.subscribe_folder(folder)
+         server.move([uid], folder)
+ 
+-    with IMAPClient(HOST, ssl=True) as server:
++    ssl_context = ssl.create_default_context()
++    ssl_context.check_hostname = False
++
++    with IMAPClient(HOST, ssl=True, ssl_context=ssl_context) as server:
+         server.login(USERNAME, PASSWORD)
+         for suffix in folder_suffixes:
+             report_folder = '{}report_{}'.format(INBOXPREFIX, suffix)
