@@ -1,7 +1,6 @@
 { python3Packages
 , fetchFromGitHub
-, qtwayland
-, wrapQtAppsHook
+, qt6
 , lib
 }:
 
@@ -23,16 +22,16 @@ python3Packages.buildPythonApplication rec {
 
   nativeBuildInputs = [
     python3Packages.pyqt5
-    wrapQtAppsHook
+    qt6.wrapQtAppsHook
   ];
 
   buildInputs = [
-    qtwayland
+    qt6.qtwayland
   ];
 
   propagatedBuildInputs = with python3Packages; [
     grpcio-tools
-    pyqt5
+    pyqt6
     unidecode
     unicode-slugify
     pyinotify
