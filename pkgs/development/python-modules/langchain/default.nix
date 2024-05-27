@@ -4,6 +4,12 @@
   async-timeout,
   bash,
   buildPythonPackage,
+  chardet,
+  clarifai,
+  cohere,
+  dataclasses-json,
+  docarray,
+  esprima,
   fetchFromGitHub,
   freezegun,
   langchain-core,
@@ -28,7 +34,6 @@
   tenacity,
   toml,
 }:
-
 buildPythonPackage rec {
   pname = "langchain";
   version = "0.2.5";
@@ -61,6 +66,46 @@ buildPythonPackage rec {
     sqlalchemy
     tenacity
   ] ++ lib.optionals (pythonOlder "3.11") [ async-timeout ];
+
+  passthru.optional-dependencies = {
+    llms = [
+      clarifai
+      cohere
+      openai
+      # openlm
+      nlpcloud
+      huggingface-hub
+      manifest-ml
+      torch
+      transformers
+    ];
+    qdrant = [ qdrant-client ];
+    openai = [
+      openai
+      tiktoken
+    ];
+    text_helpers = [ chardet ];
+    clarifai = [ clarifai ];
+    cohere = [ cohere ];
+    docarray = [
+      # docarray
+    ];
+    embeddings = [ sentence-transformers ];
+    javascript = [ esprima ];
+    azure = [
+      azure-identity
+      azure-cosmos
+      openai
+      azure-core
+      # azure-ai-formrecognizer
+      # azure-ai-vision
+      # azure-cognitiveservices-speech
+      # azure-search-documents
+      # azure-ai-textanalytics
+    ];
+    all = [ ];
+    cli = [ typer ];
+  };
 
   nativeCheckInputs = [
     freezegun
