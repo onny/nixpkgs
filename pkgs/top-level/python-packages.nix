@@ -3342,6 +3342,8 @@ self: super: with self; {
 
   django-cleanup = callPackage ../development/python-modules/django-cleanup { };
 
+  django-cms = callPackage ../development/python-modules/django-cms { };
+
   django-colorful = callPackage ../development/python-modules/django-colorful { };
 
   django-compressor = callPackage ../development/python-modules/django-compressor { };
@@ -3381,6 +3383,8 @@ self: super: with self; {
   django-environ = callPackage ../development/python-modules/django-environ { };
 
   django-extensions = callPackage ../development/python-modules/django-extensions { };
+
+  django-filer = callPackage ../development/python-modules/django-filer { };
 
   django-filter = callPackage ../development/python-modules/django-filter { };
 
