@@ -2,9 +2,20 @@
   python3,
   fetchFromGitHub,
   makeWrapper,
+  froide,
+  gdal,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+let
+
+  python = python3.override {
+    packageOverrides = self: super: {
+      django = super.django.override { withGdal = true; };
+    };
+  };
+
+in
+python.pkgs.buildPythonApplication rec {
   pname = "froide-govplan";
   version = "1";
 
@@ -17,11 +28,13 @@ python3.pkgs.buildPythonApplication rec {
 
   pyproject = true;
 
-  build-system = [ python3.pkgs.setuptools ];
+  build-system = [ python.pkgs.setuptools ];
+
+  build-inputs = [ gdal ];
 
   nativeBuildInputs = [ makeWrapper ];
 
-  dependencies = with python3.pkgs; [
+  dependencies = with python.pkgs; [
     bleach
     django-admin-sortable2
     django-cms
@@ -30,13 +43,17 @@ python3.pkgs.buildPythonApplication rec {
     django-oauth-toolkit
     django-tinymce
     psycopg
-    #froide
+    froide
+    django-mptt
+    django-sekizai
+    django-treebeard
   ];
 
   postInstall = ''
-    cp manage.py $out/${python3.sitePackages}/froide_govplan/
-    cp -r project $out/${python3.sitePackages}/froide_govplan/
-    makeWrapper $out/${python3.sitePackages}/froide_govplan/manage.py $out/bin/froide-govplan \
-      --prefix PYTHONPATH : "$PYTHONPATH"
+    cp manage.py $out/${python.sitePackages}/froide_govplan/
+    cp -r project $out/${python.sitePackages}/froide_govplan/
+    makeWrapper $out/${python.sitePackages}/froide_govplan/manage.py $out/bin/froide-govplan \
+      --prefix PYTHONPATH : "$PYTHONPATH" \
+      --set GDAL_LIBRARY_PATH "${gdal}/lib/libgdal.so"
   '';
 }
