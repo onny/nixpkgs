@@ -10,7 +10,7 @@ let
 
   python = python3.override {
     packageOverrides = self: super: {
-      django = super.django.override { withGdal = true; };
+      django = super.django_5.override { withGdal = true; };
     };
   };
 
