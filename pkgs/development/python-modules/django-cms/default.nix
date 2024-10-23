@@ -4,12 +4,18 @@
   fetchPypi,
   django,
   pythonOlder,
+  pytestCheckHook,
+  setuptools,
+  django-classy-tags,
+  django-formtools,
+  django-treebeard,
+  django-sekizai,
 }:
 
 buildPythonPackage rec {
   pname = "django-cms";
   version = "4.1.3";
-  format = "setuptools";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -19,15 +25,28 @@ buildPythonPackage rec {
     hash = "sha256-I62u9oxI45um93zYx3CnH78em8tXLqZt0ucb6O94vQ0=";
   };
 
-  propagatedBuildInputs = [ django ];
+  build-system = [ setuptools ];
+
+  dependencies = [
+    django
+    django-classy-tags
+    django-formtools
+    django-treebeard
+    django-sekizai
+    djangocms-admin-style
+  ];
+
+  env.DJANGO_SETTINGS_MODULE = "tests.settings";
+
+  checkInputs = [ pytestCheckHook ];
 
   pythonImportCheck = [ "django-cms" ];
 
   meta = {
-    description = "Django application to retrieve user's IP address";
+    description = "Lean enterprise content management powered by Django";
     homepage = "https://django-cms.org";
-    changelog = "https://github.com/django-cms/django-cms/blob/develop-4/CHANGELOG.rst";
-    license = lib.licenses.mit;
+    changelog = "https://github.com/django-cms/django-cms/releases/tag/${version}";
+    license = lib.licenses.bsd3;
     maintainers = [ lib.maintainers.onny ];
   };
 }
