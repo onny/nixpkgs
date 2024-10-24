@@ -17,6 +17,9 @@
   pikepdf,
   pypdf,
   pycryptodome,
+  python-poppler,
+  zipstream,
+  django-json-widget,
 }:
 
 buildPythonPackage rec {
@@ -49,6 +52,9 @@ buildPythonPackage rec {
     pikepdf
     pypdf
     pycryptodome
+    python-poppler
+    zipstream
+    django-json-widget
   ];
 
   optional-dependencies = {
