@@ -10,6 +10,7 @@
   django-formtools,
   django-treebeard,
   django-sekizai,
+  djangocms-admin-style,
 }:
 
 buildPythonPackage rec {
