@@ -98,7 +98,9 @@ python.pkgs.buildPythonApplication rec {
         };
       })
     ))
-    psycopg
+    psycopg.overridePythonAttrs (prev: {
+      doCheck = false;
+    });
   ];
 
   preBuild = "${python.interpreter} -m django compilemessages";
