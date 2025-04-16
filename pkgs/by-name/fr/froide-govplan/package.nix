@@ -15,6 +15,8 @@ let
   python = python3Packages.python.override {
     packageOverrides = self: super: {
       django = super.django.override { withGdal = true; };
+      psycopg = super.psycopg.overridePythonAttrs { doCheck = false; };
+      moto = super.moto.overridePythonAttrs { doCheck = false; };
     };
   };
 in
