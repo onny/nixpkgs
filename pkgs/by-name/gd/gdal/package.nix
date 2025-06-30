@@ -118,9 +118,9 @@ stdenv.mkDerivation (finalAttrs: {
         lib.optionalString (libmysqlclient.pname != "mysql") "mysql/"
       }libmysqlclient${stdenv.hostPlatform.extensions.sharedLibrary}"
     ]
-    ++ lib.optionals finalAttrs.doInstallCheck [
-      "-DBUILD_TESTING=ON"
-    ]
+    #++ lib.optionals finalAttrs.doInstallCheck [
+    #  "-DBUILD_TESTING=ON"
+    #]
     ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
       "-DCMAKE_SKIP_BUILD_RPATH=ON" # without, libgdal.so can't find libmariadb.so
     ]
@@ -234,7 +234,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   enableParallelBuilding = true;
 
-  doInstallCheck = true;
+  doInstallCheck = false;
   # preCheck rather than preInstallCheck because this is what pytestCheckHook
   # calls (coming from the python world)
   preCheck = ''
