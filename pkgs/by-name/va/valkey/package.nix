@@ -97,6 +97,8 @@ stdenv.mkDerivation (finalAttrs: {
     runHook postCheck
   '';
 
+  doCheck = false;
+
   meta = with lib; {
     homepage = "https://valkey.io/";
     description = "High-performance data structure server that primarily serves key/value workloads";

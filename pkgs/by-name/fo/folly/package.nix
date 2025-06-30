@@ -40,7 +40,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "folly";
-  version = "2025.04.21.00";
+  version = "2025.06.23.00";
 
   # split outputs to reduce downstream closure sizes
   outputs = [
@@ -52,7 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "facebook";
     repo = "folly";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-P2saSFVRBWt5xjAWlKmcPJT9MFV9CXFmA18dIDCO84o=";
+    hash = "sha256-h5kuwPO2cpMrBWnEdK1I0HCU3z9sJsp9pjc2AGwqBoY=";
   };
 
   nativeBuildInputs = [
@@ -104,6 +104,11 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "LIB_INSTALL_DIR" "${placeholder "out"}/lib")
     (lib.cmakeFeature "CMAKE_INSTALL_DIR" "${placeholder "dev"}/lib/cmake/folly")
     (lib.cmakeFeature "CMAKE_INSTALL_PREFIX" (placeholder "dev"))
+    (lib.cmakeFeature "FOLLY_HAVE_WCHAR_SUPPORT_EXITCODE" "")
+    (lib.cmakeFeature "HAVE_VSNPRINTF_ERRORS_EXITCODE" "")
+    (lib.cmakeFeature "FOLLY_HAVE_LINUX_VDSO_EXITCODE" "")
+    (lib.cmakeFeature "FOLLY_HAVE_WEAK_SYMBOLS_EXITCODE" "")
+    (lib.cmakeFeature "FOLLY_HAVE_UNALIGNED_ACCESS_EXITCODE" "")
   ];
 
   env.NIX_CFLAGS_COMPILE = lib.concatStringsSep " " (
