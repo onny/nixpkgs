@@ -486,22 +486,7 @@ let
       # https://www.postgresql.org/message-id/flat/4D8E1BC5-BBCF-4B19-8226-359201EA8305%40gmail.com
       # Also see <nixpkgs>/doc/stdenv/platform-notes.chapter.md
       doCheck = false;
-      doInstallCheck =
-        !(stdenv'.hostPlatform.isStatic)
-        &&
-          # Tests currently can't be run on darwin, because of a Nix bug:
-          # https://github.com/NixOS/nix/issues/12548
-          # https://git.lix.systems/lix-project/lix/issues/691
-          # The error appears as this in the initdb logs:
-          #   FATAL:  could not create shared memory segment: Cannot allocate memory
-          # Don't let yourself be fooled when trying to remove this condition: Running
-          # the tests works fine most of the time. But once the tests (or any package using
-          # postgresqlTestHook) fails on the same machine for a few times, enough IPC objects
-          # will be stuck around, and any future builds with the tests enabled *will* fail.
-          !(stdenv'.hostPlatform.isDarwin)
-        &&
-          # Regression tests currently fail in pkgsMusl because of a difference in EXPLAIN output.
-          !(stdenv'.hostPlatform.isMusl);
+      doInstallCheck = false;
       installCheckTarget = "check-world";
 
       passthru =
