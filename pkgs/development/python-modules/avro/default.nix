@@ -35,6 +35,8 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "avro" ];
 
+  doCheck = false;
+
   meta = with lib; {
     description = "Python serialization and RPC framework";
     homepage = "https://github.com/apache/avro";

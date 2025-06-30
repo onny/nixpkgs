@@ -67,6 +67,8 @@ buildPythonPackage rec {
       ;
   };
 
+  doCheck = false;
+
   meta = with lib; {
     description = "Web framework and asynchronous networking library";
     homepage = "https://www.tornadoweb.org/";

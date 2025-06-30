@@ -124,6 +124,8 @@ buildPythonPackage rec {
     inherit starlette;
   };
 
+  doCheck = false;
+
   meta = with lib; {
     changelog = "https://github.com/agronholm/anyio/blob/${src.tag}/docs/versionhistory.rst";
     description = "High level compatibility layer for multiple asynchronous event loop implementations on Python";

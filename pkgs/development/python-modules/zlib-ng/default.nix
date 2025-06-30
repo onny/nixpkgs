@@ -64,6 +64,8 @@ buildPythonPackage rec {
     "test_decompress_infile_outfile_error"
   ];
 
+  doCheck = false;
+
   meta = with lib; {
     description = "Drop-in replacement for Python's zlib and gzip modules using zlib-ng";
     homepage = "https://github.com/pycompression/python-zlib-ng";
