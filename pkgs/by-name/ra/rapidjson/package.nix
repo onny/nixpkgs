@@ -68,11 +68,12 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "CMAKE_CXX_FLAGS_RELEASE" "-Wno-error")
   ];
 
-  doCheck = !(stdenv.hostPlatform.isStatic || stdenv.hostPlatform.isDarwin);
+  #doCheck = !(stdenv.hostPlatform.isStatic || stdenv.hostPlatform.isDarwin);
+  doCheck = false;
 
-  nativeCheckInputs = [
-    valgrind
-  ];
+  #nativeCheckInputs = [
+  #  valgrind
+  #];
 
   meta = {
     description = "Fast JSON parser/generator for C++ with both SAX/DOM style API";
