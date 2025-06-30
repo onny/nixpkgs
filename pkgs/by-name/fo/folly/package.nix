@@ -113,6 +113,9 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "FOLLY_HAVE_WEAK_SYMBOLS_EXITCODE" "")
     (lib.cmakeFeature "FOLLY_HAVE_UNALIGNED_ACCESS_EXITCODE" "")
     (lib.cmakeFeature "FOLLY_HAVE_INT128_T" "1")
+    (lib.cmakeBool "FOLLY_USE_JEMALLOC" false)
+    (lib.cmakeBool "FOLLY_HAS_EPOLL" false)
+    (lib.cmakeBool "FOLLY_USE_EPOLLET" false)
   ];
 
   env.NIX_CFLAGS_COMPILE = lib.concatStringsSep " " (
@@ -157,6 +160,8 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail \
         ${lib.escapeShellArg "\${prefix}/@CMAKE_INSTALL_INCLUDEDIR@"} \
         '@CMAKE_INSTALL_FULL_INCLUDEDIR@'
+    substituteInPlace folly/io/async/Epoll.h \
+      --replace-fail "FOLLY_HAS_EPOLL 1" "FOLLY_HAS_EPOLL 0"
   '';
 
   # TODO: Figure out why `GTEST_FILTER` doesn’t work to skip these.
