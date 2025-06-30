@@ -15,10 +15,10 @@ buildPythonPackage rec {
     hash = "sha256-JTVNnjZH+UQRpME+UQyDoc7swXl3sFJbpBsW5wGceww=";
   };
 
-  postPatch = ''
-    substituteInPlace pywatchman/__init__.py \
-      --replace "'watchman'" "'${watchman}/bin/watchman'"
-  '';
+  #postPatch = ''
+  #  substituteInPlace pywatchman/__init__.py \
+  #    --replace "'watchman'" "'${watchman}/bin/watchman'"
+  #'';
 
   # No tests in archive
   doCheck = false;
