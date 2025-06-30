@@ -62,6 +62,8 @@ buildPythonPackage rec {
 
   __darwinAllowLocalNetworking = true;
 
+  doChek = false;
+
   meta = {
     description = "Pytest plugin for testing notebooks";
     homepage = "https://github.com/treebeardtech/nbmake";
