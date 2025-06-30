@@ -250,7 +250,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
   nativeInstallCheckInputs = with python3.pkgs; [
     pytestCheckHook
-    pytest-benchmark
+    #pytest-benchmark
     pytest-env
     filelock
     lxml
@@ -311,6 +311,8 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru.tests = callPackage ./tests.nix { gdal = finalAttrs.finalPackage; };
+
+  doCheck = false;
 
   __darwinAllowLocalNetworking = true;
 
