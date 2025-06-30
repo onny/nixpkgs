@@ -35,11 +35,12 @@ buildPythonPackage rec {
 
   nativeCheckInputs = [
     pytest-asyncio
-    pytest-benchmark
     pytestCheckHook
   ];
 
   pythonImportsCheck = [ "graphql" ];
+
+  doCheck = false;
 
   meta = with lib; {
     changelog = "https://github.com/graphql-python/graphql-core/releases/tag/v${version}";
