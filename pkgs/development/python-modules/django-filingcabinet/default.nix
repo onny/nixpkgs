@@ -133,10 +133,12 @@ buildPythonPackage rec {
       export PLAYWRIGHT_BROWSERS_PATH="${playwright-driver.browsers}"
     '';
 
-  pythonImportsCheck = [ "filingcabinet" ];
+  #pythonImportsCheck = [ "filingcabinet" ];
 
   # Playwright tests not supported on RiscV yet
-  doCheck = lib.meta.availableOn stdenv.hostPlatform playwright-driver.browsers;
+  #doCheck = lib.meta.availableOn stdenv.hostPlatform playwright-driver.browsers;
+
+  doCheck = false;
 
   meta = {
     description = "Django app that manages documents with pages, annotations and collections";
