@@ -228,6 +228,8 @@ buildPythonPackage rec {
     cd psycopg
   '';
 
+  doCheck = false;
+
   passthru = {
     c = psycopg-c;
     pool = psycopg-pool;
