@@ -384,6 +384,8 @@ buildPythonPackage rec {
 
   doCheck = false;
 
+  pythonImportsCheck = [];
+
   meta = {
     description = "Allows your tests to easily mock out AWS Services";
     homepage = "https://github.com/getmoto/moto";
