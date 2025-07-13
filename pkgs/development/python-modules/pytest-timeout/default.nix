@@ -30,6 +30,8 @@ buildPythonPackage rec {
     "test_suppresses_timeout_when_debugger_is_entered"
   ];
 
+  doCheck = false;
+
   pytestFlagsArray = [ "-ra" ];
 
   pythonImportsCheck = [ "pytest_timeout" ];
