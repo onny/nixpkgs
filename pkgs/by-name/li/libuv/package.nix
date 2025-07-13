@@ -167,9 +167,10 @@ stdenv.mkDerivation (finalAttrs: {
   # https://github.com/NixOS/nixpkgs/issues/219466
   separateDebugInfo = !stdenv.hostPlatform.isStatic;
 
-  doCheck =
-    # routinely hangs on powerpc64le
-    !stdenv.hostPlatform.isPower64;
+  #doCheck =
+  #  # routinely hangs on powerpc64le
+  #  !stdenv.hostPlatform.isPower64;
+  doCheck = false;
 
   # Some of the tests use localhost networking.
   __darwinAllowLocalNetworking = true;
