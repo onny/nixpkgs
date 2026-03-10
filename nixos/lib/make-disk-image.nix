@@ -99,6 +99,7 @@
 */
 {
   pkgs,
+  pkgsHostHost,
   lib,
 
   # The NixOS configuration to be installed onto the disk image.
@@ -389,8 +390,10 @@ let
     echo -n ${config.system.nixos.versionSuffix} > $out/nixos/.version-suffix
   '';
 
-  binPath = lib.makeBinPath (
-    with pkgs;
+  binPath = let
+    pkgs' = pkgs;
+    in lib.makeBinPath (
+    with pkgs';
     [
       rsync
       util-linux
@@ -404,6 +407,26 @@ let
     ]
     ++ lib.optional deterministic gptfdisk
     ++ stdenv.initialPath
+    );
+
+  guestBinPath = let
+    pkgs' = if (pkgs.stdenv.buildPlatform != pkgs.stdenv.hostPlatform) then pkgsHostHost else pkgs;
+    in lib.makeBinPath (
+    with pkgs';
+    [
+      coreutils
+      rsync
+      util-linux
+      parted
+      e2fsprogs
+      lkl
+      config.system.build.nixos-install
+      nixos-enter
+      nix
+      systemdMinimal
+    ]
+    ++ lib.optional deterministic gptfdisk
+    #++ stdenv.initialPath
   );
 
   # I'm preserving the line below because I'm going to search for it across nixpkgs to consolidate
@@ -682,7 +705,7 @@ let
         inherit memSize;
       }
       ''
-        export PATH=${binPath}:$PATH
+        export PATH=${guestBinPath}:$PATH
 
         rootDisk=${if partitionTableType != "none" then "/dev/vda${rootPartition}" else "/dev/vda"}
 

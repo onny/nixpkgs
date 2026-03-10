@@ -2,6 +2,14 @@
   lib,
   stdenv,
   buildPackages,
+  targetPackages,
+  pkgs,
+  pkgsBuildBuild,
+  pkgsBuildHost,
+  pkgsBuildTarget,
+  pkgsHostHost,
+  pkgsHostTarget,
+  pkgsTargetTarget,
   bash,
   bashInteractive,
   busybox,
@@ -48,7 +56,7 @@
 let
   qemu-common = import ../../../nixos/lib/qemu-common.nix { inherit lib stdenv; };
 
-  qemu = buildPackages.qemu_kvm;
+  qemu = buildPackages.qemu;
 
   modulesClosure = makeModulesClosure {
     kernel = lib.getOutput "modules" kernel;
@@ -200,20 +208,38 @@ let
   stage2Init = writeScript "vm-run-stage2" ''
     #! ${bash}/bin/sh
     set -euo pipefail
+    echo "in stage 2 xx"
+    echo MY saved-env IS:
+    ${coreutils}/bin/cat /tmp/xchg/saved-env
     source /tmp/xchg/saved-env
+    # now add buildInputs to PATH
+    for i in $nativeBuildInputs $buildInputs; do
+      if [ -d "$i/bin" ]; then
+        PATH="$i/bin:$PATH"
+      fi
+    done
     if [ -f /tmp/xchg/.attrs.sh ]; then
       source /tmp/xchg/.attrs.sh
       export NIX_ATTRS_JSON_FILE=/tmp/xchg/.attrs.json
       export NIX_ATTRS_SH_FILE=/tmp/xchg/.attrs.sh
     fi
 
+    echo MY ENV IS:
+    export
+
     export NIX_STORE=${storeDir}
     export NIX_BUILD_TOP=/tmp
     export TMPDIR=/tmp
-    export PATH=/empty
+    #export PATH=/empty
     cd "$NIX_BUILD_TOP"
+    
+    #echo MY STDENV IS:
+    #echo $my_stdenv
 
-    source $stdenv/setup
+    #source $my_stdenv/setup
+
+    echo MY PATH IS:
+    echo $PATH
 
     if ! test -e /bin/sh; then
       ${coreutils}/bin/mkdir -p /bin
@@ -230,25 +256,13 @@ let
     ${coreutils}/bin/chmod 755 /run/modprobe
     echo /run/modprobe > /proc/sys/kernel/modprobe
 
-    # For debugging: if this is the second time this image is run,
-    # then don't start the build again, but instead drop the user into
-    # an interactive shell.
-    if test -n "$origBuilder" -a ! -e /.debug; then
-      exec < /dev/null
-      ${coreutils}/bin/touch /.debug
-      declare -a argsArray=()
-      concatTo argsArray origArgs
-      "$origBuilder" "''${argsArray[@]}"
+    if test -n "$buildCommand"; then
+      eval "$buildCommand"
       echo $? > /tmp/xchg/in-vm-exit
 
       ${busybox}/bin/mount -o remount,ro dummy /
 
       ${busybox}/bin/poweroff -f
-    else
-      export PATH=/bin:/usr/bin:${coreutils}/bin
-      echo "Starting interactive shell..."
-      echo "(To run the original builder: \$origBuilder \$origArgs)"
-      exec ${busybox}/bin/setsid ${bashInteractive}/bin/bash < /dev/${qemu-common.qemuSerialDevice} &> /dev/${qemu-common.qemuSerialDevice}
     fi
   '';
 
@@ -267,14 +281,38 @@ let
       $QEMU_OPTS
   '';
 
-  vmRunCommand =
+  vmRunCommand = let
+  check = name: val:
+    builtins.trace "${name} has coreutils: ${toString (val ? coreutils)}"
+      null;
+  vmPath = lib.makeBinPath (with pkgsHostHost;
+    [ coreutils bash gnutar /* whatever else the builder needs */ ]);
+
+in
+  builtins.trace (builtins.deepSeq {
+    a = check "buildPackages" buildPackages;
+    b = check "targetPackages" targetPackages;
+    c = check "pkgsBuildBuild" pkgsBuildBuild;
+    d = check "pkgsBuildHost" pkgsBuildHost;
+    e = check "pkgsBuildTarget" pkgsBuildTarget;
+    f = check "pkgsHostHost" pkgsHostHost;
+    g = check "pkgsHostTarget" pkgsHostTarget;
+    h = check "pkgsTargetTarget" pkgsTargetTarget;
+    j = builtins.trace "pkgsHostHost.stdenv.hostPlatform: ${pkgsHostHost.stdenv.hostPlatform.system}" "a";
+    k = builtins.trace "stdenv.hostPlatform: ${stdenv.hostPlatform.system}" "a";
+    l = builtins.trace "stdenv.buildPlatform: ${stdenv.buildPlatform.system}" "a";
+  }) (
     qemuCommand:
     writeText "vm-run" ''
-      ${coreutils}/bin/mkdir xchg
+      ${buildPackages.coreutils}/bin/mkdir xchg
+      #export
       export > xchg/saved-env
+      #echo "export my_stdenv=${pkgsHostHost.stdenv}" >> xchg/saved-env
+      #echo "export my_coreutils=${pkgsHostHost.coreutils}" >> xchg/saved-env
+      echo "export PATH=${vmPath}:$PATH" >> xchg/saved-env
 
       if [ -f "''${NIX_ATTRS_SH_FILE-}" ]; then
-        ${coreutils}/bin/cp $NIX_ATTRS_JSON_FILE $NIX_ATTRS_SH_FILE xchg
+        #${buildPackages.coreutils}/bin/cp $NIX_ATTRS_JSON_FILE $NIX_ATTRS_SH_FILE xchg
         source "$NIX_ATTRS_SH_FILE"
       fi
       source $stdenv/setup
@@ -298,22 +336,22 @@ let
       # Write the command to start the VM to a file so that the user can
       # debug inside the VM if the build fails (when Nix is called with
       # the -K option to preserve the temporary build directory).
-      ${coreutils}/bin/cat > ./run-vm <<EOF
-      #! ${bash}/bin/sh
+      ${buildPackages.coreutils}/bin/cat > ./run-vm <<EOF
+      #! ${buildPackages.bash}/bin/sh
       ''${diskImage:+diskImage=$diskImage}
       # GitHub Actions runners seems to not allow installing seccomp filter: https://github.com/rcambrj/nix-pi-loader/issues/1#issuecomment-2605497516
       # Since we are running in a sandbox already, the difference between seccomp and none is minimal
-      ${virtiofsd}/bin/virtiofsd --xattr --socket-path virtio-store.sock --sandbox none --seccomp none --shared-dir "${storeDir}" &
-      ${virtiofsd}/bin/virtiofsd --xattr --socket-path virtio-xchg.sock --sandbox none --seccomp none --shared-dir xchg &
+      ${buildPackages.virtiofsd}/bin/virtiofsd --xattr --socket-path virtio-store.sock --sandbox none --seccomp none --shared-dir "${storeDir}" &
+      ${buildPackages.virtiofsd}/bin/virtiofsd --xattr --socket-path virtio-xchg.sock --sandbox none --seccomp none --shared-dir xchg &
 
       # Wait until virtiofsd has created these sockets to avoid race condition.
-      until [[ -e virtio-store.sock ]]; do ${coreutils}/bin/sleep 1; done
-      until [[ -e virtio-xchg.sock ]]; do ${coreutils}/bin/sleep 1; done
+      until [[ -e virtio-store.sock ]]; do ${buildPackages.coreutils}/bin/sleep 1; done
+      until [[ -e virtio-xchg.sock ]]; do ${buildPackages.coreutils}/bin/sleep 1; done
 
       ${qemuCommand}
       EOF
 
-      ${coreutils}/bin/chmod +x ./run-vm
+      ${buildPackages.coreutils}/bin/chmod +x ./run-vm
       source ./run-vm
 
       if ! test -e xchg/in-vm-exit; then
@@ -321,13 +359,13 @@ let
         exit 1
       fi
 
-      exitCode="$(${coreutils}/bin/cat xchg/in-vm-exit)"
+      exitCode="$(${buildPackages.coreutils}/bin/cat xchg/in-vm-exit)"
       if [ "$exitCode" != "0" ]; then
         exit "$exitCode"
       fi
 
       eval "$postVM"
-    '';
+    '');
 
   # A bash script fragment that produces a disk image at `destination`.
   createEmptyImage =
@@ -386,7 +424,12 @@ let
 
   runInLinuxVM =
     drv:
-    lib.overrideDerivation drv (
+    let
+      #drv' = drv.overrideAttrs {
+      #  stdenv = if (lib.optionalAttrs (stdenv.buildPlatform != stdenv.hostPlatform)) then pkgsHostHost.stdenv else stdenv;
+      #};
+      drv' = drv;
+    in (lib.overrideDerivation drv' (
       {
         memSize ? 512,
         QEMU_OPTS ? "",
@@ -405,7 +448,7 @@ let
         origBuilder = builder;
         QEMU_OPTS = "${QEMU_OPTS} -m ${toString memSize} -object memory-backend-memfd,id=mem,size=${toString memSize}M,share=on -machine memory-backend=mem";
         passAsFile = [ ]; # HACK fix - see https://github.com/NixOS/nixpkgs/issues/16742
-      }
+      })
     );
 
   extractFs =
