@@ -1,6 +1,6 @@
 {
   lib,
-  beam_minimal,
+  beamMinimal26Packages,
   fetchFromGitea,
   cmake,
   file,
@@ -9,14 +9,8 @@
 }:
 
 let
-  beamPackages = beam_minimal.packages.erlang_26.extend (
-    self: super: {
-      elixir = self.elixir_1_16;
-      rebar3 = self.rebar3WithPlugins {
-        plugins = with self; [ pc ];
-      };
-    }
-  );
+  beamPackages = beamMinimal26Packages;
+  buildBeamPackages = beamMinimal26Packages.buildBeamPackages;
 in
 beamPackages.mixRelease rec {
   pname = "akkoma";
@@ -33,6 +27,12 @@ beamPackages.mixRelease rec {
     forceFetchGit = true;
   };
 
+  elixir = beamMinimal26Packages.elixir_1_16;
+  rebar3 = buildBeamPackages.rebar3WithPlugins {
+    plugins = with buildBeamPackages;
+      [ pc ];
+  };
+
   nativeBuildInputs = [ cmake ];
   buildInputs = [ file ];
 
@@ -44,12 +44,12 @@ beamPackages.mixRelease rec {
     # which does not yet provide ImageMagick 7.
     # Remove this patch once merged upstream.
     ./akkoma-imagemagick.patch
-  ];
+  ]; 
 
-  mixFodDeps = beamPackages.fetchMixDeps {
-    pname = "mix-deps-${pname}";
+  mixFodDeps = buildBeamPackages.fetchMixDeps {
+    pname = "mix-deps-akkoma";
     inherit src version;
-    hash = "sha256-DqSeMjom9UjgGjjfJomWCr7jQhXEkqVrDCvW3+pDtcQ=";
+    hash = "sha256-GMMX7uiyNVihz5V+kKFTjE0vcAraEwjmNn5bTX36mzQ=";
 
     postInstall = ''
       substituteInPlace "$out/http_signatures/mix.exs" \
@@ -66,6 +66,11 @@ beamPackages.mixRelease rec {
         mkdir -p "$dep/config"
         cat ${./mime.exs} >>"$dep/config/config.exs"
       done
+
+      # remove hardcoded reference to build erlang in fasthtml dep
+      substituteInPlace "$out/fast_html/Makefile" \
+        --replace-fail 'ERLANG_PATH = ' 'ERLANG_PATH ?= ' \
+        --replace-fail 'ERL_INTERFACE = ' 'ERL_INTERFACE ?= '
     '';
   };
 
@@ -73,6 +78,9 @@ beamPackages.mixRelease rec {
     # Remove dependency on OS_Mon
     sed -E -i 's/(^|\s):os_mon,//' \
       mix.exs
+
+    # add include_erts for mixRelease to modify if needed
+    sed -i '/pleroma: \[/a\        include_erts: true,' mix.exs
   '';
 
   dontUseCmakeConfigure = true;
@@ -92,7 +100,7 @@ beamPackages.mixRelease rec {
 
     # Used to make sure the service uses the same version of elixir as
     # the package
-    elixirPackage = beamPackages.elixir;
+    elixirPackage = elixir;
 
     updateScript = nix-update-script { };
   };

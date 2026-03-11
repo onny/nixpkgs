@@ -3,7 +3,7 @@
   stdenv,
   fetchFromGitHub,
   erlang,
-  pkgsBuildHost,
+  buildBeamPackages
 }:
 
 stdenv.mkDerivation rec {
@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ erlang ];
 
-  buildPhase = "${pkgsBuildHost.beam_minimal.interpreters.erlang}/bin/escript bootstrap";
+  buildPhase = "${buildBeamPackages.erlang}/bin/escript bootstrap";
 
   installPhase = ''
     mkdir -p $out/bin

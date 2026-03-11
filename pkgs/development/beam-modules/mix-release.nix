@@ -17,6 +17,8 @@
   gnugrep,
   gawk,
   mixBuildDirHook,
+  buildBeamPackages,
+  buildPackages
 }@inputs:
 
 {
@@ -61,6 +63,9 @@
   elixir ? inputs.elixir,
   erlang ? inputs.erlang,
   hex ? inputs.hex.override { inherit elixir; },
+  buildElixir ? inputs.elixir,
+  buildErlang ? inputs.erlang,
+  rebar3 ? inputs.rebar3,
 
   # Remove releases/COOKIE
   #
@@ -105,8 +110,8 @@ stdenv.mkDerivation (
       ++
         # Erlang/Elixir deps
         [
-          erlang
-          elixir
+          buildBeamPackages.erlang
+          buildBeamPackages.elixir
           hex
           git
           mixBuildDirHook
@@ -159,7 +164,6 @@ stdenv.mkDerivation (
       # Rebar
       export REBAR_GLOBAL_CONFIG_DIR="$TEMPDIR/rebar3"
       export REBAR_CACHE_DIR="$TEMPDIR/rebar3.cache"
-
       ${lib.optionalString (mixFodDeps != null) ''
         # Compilation of the dependencies will require that the dependency path is
         # writable, thus a copy to the $TEMPDIR is inevitable here.
@@ -178,6 +182,9 @@ stdenv.mkDerivation (
         # to be available.
         #
         # Phoenix projects for example will need compile.phoenix.
+        export ERL_EI_LIBDIR=${erlang}/lib/erlang/lib/erl_interface-5.5.1/lib/
+        export ERLANG_PATH="${erlang}/lib/erlang/erts-${erlang.version}";
+        export ERL_INTERFACE="${erlang}/lib/erlang/lib/erl_interface-5.5.1";
         mix deps.compile --no-deps-check --skip-umbrella-children
 
         # Symlink dependency sources. This is needed for projects that require
@@ -200,13 +207,21 @@ stdenv.mkDerivation (
           ln -s "$MIX_DEPS_PATH" ./deps
         ''}
 
+        ${lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
+          if grep -q 'include_erts: true' mix.exs; then
+            substituteInPlace mix.exs \
+              --replace-fail 'include_erts: true' 'include_erts: false'
+          else
+            echo "WARNING: mix.exs does not contain 'include_erts: true' — cross-compiled release may bundle wrong ERTS" >&2
+          fi
+        ''}
+
         runHook postConfigure
       '';
 
     buildPhase =
       attrs.buildPhase or ''
         runHook preBuild
-
         mix compile --no-deps-check ${lib.concatStringsSep " " compileFlags}
 
         ${lib.optionalString (escriptBinName != null) ''
@@ -244,6 +259,7 @@ stdenv.mkDerivation (
         wrapProgram "$f" \
           --prefix PATH : ${
             lib.makeBinPath [
+              erlang
               coreutils
               gnused
               gnugrep

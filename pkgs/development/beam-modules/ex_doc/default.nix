@@ -5,7 +5,6 @@
   fetchMixDeps,
   mixRelease,
   nix-update-script,
-  pkgsBuildHost,
 
   # for tests
   beam27Packages,
@@ -14,7 +13,7 @@
 # Based on ../elixir-ls/default.nix
 
 let
-  buildElixir = pkgsBuildHost.beam_minimal.packages.erlang.elixir;
+  buildElixir = buildBeamPackages.elixir;
   pname = "ex_doc";
   version = "0.40.1";
   src = fetchFromGitHub {

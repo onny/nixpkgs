@@ -12,15 +12,15 @@
   git,
   gnused,
   nix,
-  pkgsBuildHost,
   rebar3-nix,
+  buildBeamPackages
 }:
 
 let
   version = "3.26.0";
   owner = "erlang";
   deps = import ./rebar-deps.nix { inherit fetchFromGitHub fetchgit fetchHex; };
-  escript = "${pkgsBuildHost.beam_minimal.interpreters.erlang}/bin/escript";
+  escript = "${buildBeamPackages.erlang}/bin/escript";
   rebar3 = stdenv.mkDerivation rec {
     pname = "rebar3";
     inherit version erlang;
@@ -158,16 +158,17 @@ let
       # add plugins to the code path.
 
       installPhase = ''
-        erl -noshell -eval '
+        ${buildBeamPackages.erlang}/bin/erl -noshell -eval '
           {ok, Escript} = escript:extract("${rebar3Patched}/bin/rebar3", []),
           {archive, Archive} = lists:keyfind(archive, 1, Escript),
           {ok, _} = zip:extract(Archive, [{cwd, "'$out/lib'"}]),
           init:stop(0)
         '
+
         cp ${./rebar_ignore_deps.erl} rebar_ignore_deps.erl
-        erlc -o $out/lib/rebar/ebin rebar_ignore_deps.erl
+        ${buildBeamPackages.erlang}/bin/erlc -o $out/lib/rebar/ebin rebar_ignore_deps.erl
         mkdir -p $out/bin
-        makeWrapper ${erlang}/bin/erl $out/bin/rebar3 \
+        makeWrapper ${buildBeamPackages.erlang}/bin/erl $out/bin/rebar3 \
           --set REBAR_GLOBAL_PLUGINS "${toString globalPluginNames} rebar_ignore_deps" \
           --suffix-each ERL_LIBS ":" "$out/lib ${toString pluginLibDirs}" \
           --add-flags "+sbtu +A1 -noshell -boot start_clean -s rebar3 main -extra"

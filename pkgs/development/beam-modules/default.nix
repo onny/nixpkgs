@@ -2,6 +2,7 @@
   lib,
   pkgs,
   erlang,
+  buildBeamPackages
 }:
 
 let
@@ -24,7 +25,7 @@ let
       callPackages = drv: args: callPackagesWithScope defaultScope drv args;
     in
     rec {
-      inherit callPackage erlang;
+      inherit callPackage erlang buildBeamPackages;
       beamPackages = self;
 
       inherit (callPackage ../tools/build-managers/rebar3 { }) rebar3 rebar3WithPlugins;

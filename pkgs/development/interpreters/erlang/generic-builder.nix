@@ -35,7 +35,7 @@
   openjdk11,
   openssl,
   perl,
-  pkgsBuildBuild,
+  buildPackages,
   runtimeShell,
   stdenv,
   systemd,
@@ -51,7 +51,8 @@ let
     optionals
     optionalString
     ;
-  erlBuilder = pkgsBuildBuild.beam_minimal.interpreters."erlang_${lib.versions.major version}";
+    erlBuilder = buildPackages.beam_minimal.interpreters."erlang_${lib.versions.major version}";
+    erlang = erlBuilder;
 
   wxPackages2 =
     if stdenv.hostPlatform.isDarwin then
@@ -125,7 +126,7 @@ stdenv.mkDerivation {
   postPatch =
     optionalString isCross ''
       substituteInPlace erts/emulator/Makefile.in \
-        --replace-fail '`utils/find_cross_ycf`' '${pkgsBuildBuild.beam_minimal.interpreters.erlang}/lib/erlang/erts-*/bin/yielding_c_fun'
+        --replace-fail '`utils/find_cross_ycf`' '${erlang}/lib/erlang/erts-*/bin/yielding_c_fun'
     ''
     + optionalString (lib.versionOlder "25" version) ''
       substituteInPlace lib/os_mon/src/disksup.erl --replace-fail '"sh ' '"${runtimeShell} '

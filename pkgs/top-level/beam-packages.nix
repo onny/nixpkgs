@@ -67,15 +67,18 @@ in
   };
 
   # Helper function to generate package set with a specific Erlang version.
-  packagesWith = erlang: callPackage ../development/beam-modules { inherit erlang; };
+  packagesWith = name: erlang: callPackage ../development/beam-modules {
+    inherit erlang;
+    buildBeamPackages = pkgs.buildPackages.beam_minimal.packages.${name};
+  };
 
   # Each field in this tuple represents all Beam packages in nixpkgs built with
   # appropriate Erlang/OTP version.
-  packages = {
+  packages = rec {
     erlang = self.packages.${self.latestVersion};
-    erlang_29 = self.packagesWith self.interpreters.erlang_29;
-    erlang_28 = self.packagesWith self.interpreters.erlang_28;
-    erlang_27 = self.packagesWith self.interpreters.erlang_27;
-    erlang_26 = self.packagesWith self.interpreters.erlang_26;
+    erlang_29 = self.packagesWith "erlang_29" self.interpreters.erlang_29;
+    erlang_28 = self.packagesWith "erlang_28" self.interpreters.erlang_28;
+    erlang_27 = self.packagesWith "erlang_27" self.interpreters.erlang_27;
+    erlang_26 = self.packagesWith "erlang_26" self.interpreters.erlang_26;
   };
 }

@@ -4,7 +4,7 @@
   fetchFromGitHub,
   writeText,
   elixir,
-  pkgsBuildHost,
+  buildBeamPackages
 }:
 
 let
@@ -41,7 +41,7 @@ let
         export HEX_OFFLINE=1
         export HEX_HOME=./
         export MIX_ENV=prod
-        ${pkgsBuildHost.beam_minimal.packages.erlang.elixir}/bin/mix compile
+        ${buildBeamPackages.elixir}/bin/mix compile
         runHook postBuild
       '';
 

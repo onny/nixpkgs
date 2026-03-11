@@ -2,10 +2,10 @@
   stdenv,
   writeText,
   erlang,
-  rebar3WithPlugins,
   openssl,
   libyaml,
   lib,
+  buildBeamPackages
 }:
 
 {
@@ -30,7 +30,7 @@
 }@attrs:
 
 let
-  rebar3 = rebar3WithPlugins {
+  rebar3 = buildBeamPackages.rebar3WithPlugins {
     plugins = buildPlugins;
   };
 
@@ -60,9 +60,10 @@ let
         name = "${name}-${version}";
         inherit version;
 
+        nativeBuildInputs = [ rebar3 ];
+
         buildInputs = buildInputs ++ [
           erlang
-          rebar3
           openssl
           libyaml
         ];

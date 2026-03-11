@@ -15,7 +15,7 @@
   lib,
   makeWrapper,
   nix-update-script,
-  pkgsBuildHost,
+  buildPackages,
   stdenv,
 }:
 
@@ -45,7 +45,7 @@ let
     See https://hexdocs.pm/elixir/${version}/compatibility-and-deprecations.html
   '';
 
-  erlBuilder = pkgsBuildHost.beam_minimal.interpreters."erlang_${versions.major otpVersion}";
+  erlBuilder = buildPackages.beam_minimal.interpreters."erlang_${versions.major otpVersion}";
   isCross = stdenv.hostPlatform != stdenv.buildPlatform;
 
   maxShiftMajor = toString ((toInt (versions.major maximumOTPVersion)) + 1);

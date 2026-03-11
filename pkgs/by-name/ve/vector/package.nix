@@ -23,6 +23,7 @@
   darwin,
   versionCheckHook,
   zlib,
+  pkgsBuildHost
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -45,6 +46,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     git
     rustPlatform.bindgenHook
     installShellFiles
+    pkgsBuildHost.stdenv.cc
   ]
   # Provides the mig command used by the build scripts
   ++ lib.optional stdenv.hostPlatform.isDarwin darwin.bootstrap_cmds;
