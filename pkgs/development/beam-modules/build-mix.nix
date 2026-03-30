@@ -1,7 +1,6 @@
 {
-  elixir,
   erlang,
-  hex,
+  buildBeamPackages,
   beamCopySourceHook,
   beamModuleInstallHook,
   mixBuildDirHook,
@@ -70,8 +69,8 @@ lib.extendMkDerivation {
       '';
 
       nativeBuildInputs = (args.nativeBuildInputs or [ ]) ++ [
-        elixir
-        hex
+        buildBeamPackages.elixir
+        buildBeamPackages.hex
 
         beamCopySourceHook
         beamModuleInstallHook

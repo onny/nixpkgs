@@ -60,7 +60,10 @@ let
         name = "${name}-${version}";
         inherit version;
 
-        nativeBuildInputs = [ rebar3 ];
+        nativeBuildInputs = [
+          rebar3
+          buildBeamPackages.erlang
+        ];
 
         buildInputs = buildInputs ++ [
           erlang

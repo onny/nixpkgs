@@ -135,7 +135,7 @@ beamPackages.mixRelease rec {
         dontUseCmakeConfigure = true;
       };
 
-      syslog = prev.syslog.override { buildPlugins = with beamPackages; [ pc ]; };
+      syslog = prev.syslog.override { buildPlugins = [ beamPackages.buildBeamPackages.pc ]; };
 
       vix = prev.vix.override {
         # TOREMOVE override when upstream bumps the dependency. See
@@ -146,10 +146,13 @@ beamPackages.mixRelease rec {
           tag = "v0.36.0";
           hash = "sha256-14gqzu5TBbgrqCU4+qz0jWCK6Ar5JvmKKLcfgz5BHtw=";
         };
-        nativeBuildInputs = [ pkg-config ];
+        nativeBuildInputs = [
+          pkg-config
+          glib # For cross-compilation, provides gmacros.h
+        ];
         buildInputs = [
           vips
-          glib.dev
+          glib
         ];
         VIX_COMPILATION_MODE = "PLATFORM_PROVIDED_LIBVIPS";
       };
@@ -169,7 +172,7 @@ beamPackages.mixRelease rec {
         patchPhase = ''
           echo '{plugins, [pc]}.' >> rebar.config
         '';
-        buildPlugins = with beamPackages; [ pc ];
+        buildPlugins = [ beamPackages.buildBeamPackages.pc ];
 
         beamDeps = with final; [ p1_utils ];
       };

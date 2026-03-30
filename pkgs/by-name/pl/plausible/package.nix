@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   beam27Packages,
   elixir_1_18,
   buildNpmPackage,
@@ -168,6 +169,12 @@ beamPackages.mixRelease rec {
     config :tailwind, path: "${lib.getExe buildPackages.tailwindcss_3}"
     config :esbuild, path: "${lib.getExe esbuild}"
     EOF
+  '' + lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''
+    # For cross-compilation: use system Erlang instead of bundling ERTS
+    # The bundled ERTS would be for the build platform, not the host platform
+    # Plausible has: releases: [plausible: [include_executables_for: [:unix], ...]]
+    # We need to add include_erts: false to the plausible release config
+    sed -i 's/plausible: \[/plausible: [include_erts: false, /' mix.exs
   '';
 
   postBuild = ''
